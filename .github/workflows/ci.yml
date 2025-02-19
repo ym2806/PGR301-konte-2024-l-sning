@@ -1,0 +1,37 @@
+name: Build and Test Go App
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Sjekker ut koden
+        uses: actions/checkout@v3
+
+      - name: 🔧 Setter opp Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.24
+
+      - name: 📦 Installerer avhengigheter
+        run: go mod tidy
+
+      - name: 🏗️ Bygger applikasjonen
+        run: go build -o nbxapp
+
+      - name: 🐳 Setter opp Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: 🛠 Bygger Docker-image
+        run: docker build -t nbxapp .
+
+      - name: ✅ Tester at binærfilen fungerer
+        run: ./nbxapp &
